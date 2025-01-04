@@ -8,28 +8,59 @@ public class CustomerService(IHttpClientFactory factory): IRepository<CustomerDT
 
     private readonly HttpClient _httpClient = factory.CreateClient("BudgetPlannerAPI");
 
-    public Task<CustomerDTO> GetByIdAsync(string id)
+    public async Task<CustomerDTO> GetByIdAsync(string id)
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.GetAsync($"/customer/{id}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception($"Can find customer with id: {id}");
+        }
+
+        return await response.Content.ReadFromJsonAsync<CustomerDTO>();
     }
 
-    public Task<List<CustomerDTO>> GetAllAsync()
+    public async Task<List<CustomerDTO>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.GetAsync("/budget");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception("Unable to get items from the database");
+        }
+
+        return await response.Content.ReadFromJsonAsync<List<CustomerDTO>>();
     }
 
-    public Task<string> AddAsync(CustomerDTO item)
+    public async Task<string> AddAsync(CustomerDTO item)
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.PostAsJsonAsync($"/customer", item);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception("Unable to add customer");
+        }
+
+        return await response.Content.ReadAsStringAsync();
     }
 
-    public Task UpdateAsync(CustomerDTO item, string id)
+    public async Task UpdateAsync(CustomerDTO item, string id)
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.PutAsJsonAsync($"/customer/{id}", item);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception("Unable to update customer");
+        }
     }
 
-    public Task RemoveAsync(string id)
+    public async Task RemoveAsync(string id)
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.DeleteAsync($"/customer/{id}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception("Unable to delete customer");
+        }
     }
 }

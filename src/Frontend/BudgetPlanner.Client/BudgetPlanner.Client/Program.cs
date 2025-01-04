@@ -9,9 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
+
 builder.Services.AddHttpClient("BudgetPlannerAPI", client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5087");
+    string localhostUrl = builder.Configuration["BaseAddress:localhost"];
+    client.BaseAddress = new Uri(localhostUrl);
 });
 
 builder.Services.AddScoped<IRepository<BudgetDTO>, BudgetService>();

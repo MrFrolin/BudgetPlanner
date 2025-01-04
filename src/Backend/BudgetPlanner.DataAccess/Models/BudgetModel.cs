@@ -8,6 +8,9 @@ public class BudgetModel
     [FirestoreDocumentId]
     public string Id { get; set; }
 
+    [FirestoreProperty] 
+    public string CustomerId { get; set; }
+
     [FirestoreProperty]
     public int Year { get; set; }
 

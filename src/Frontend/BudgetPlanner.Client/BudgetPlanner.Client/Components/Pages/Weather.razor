@@ -46,6 +46,12 @@ else
     {
         var test = await BudgetService.GetAllAsync();
 
+        var test1 = await BudgetService.GetByIdAsync("mFA0HLVk8lNOaLOhdGfe");
+
+        var newBudget = new BudgetDTO(){Month = 1, Year = 2025, TransactionIds = new List<string>()};
+        var test2 = await BudgetService.AddAsync(newBudget);
+
+
         // Simulate asynchronous loading to demonstrate streaming rendering
         await Task.Delay(500);
 
