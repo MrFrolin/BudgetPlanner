@@ -8,7 +8,6 @@ This project developed for a private use to easy keep track of my expences. The 
 - **Income Tracker:** Record different sources of income and monitor overall earnings.  
 - **Budget Planning:** Set monthly budgets for categories and track progress.  
 - **Financial Goals:** Set savings goals and monitor progress towards achieving them.  
-- **Reports and Analytics:** Visual representation of income, expenses, and budget performance through charts and graphs.  
 
 ## Tech Stack
 
