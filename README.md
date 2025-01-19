@@ -1,4 +1,4 @@
-# BudgetPlanner: Personal Finance Tracker (Under Development)
+# Personal Finance Tracker (Under Development)
 
 This project developed for a private use to easy keep track of my expences. The goal is to provide a platform for users to track their income, expenses, set budgets, and achieve their financial goals.
 
