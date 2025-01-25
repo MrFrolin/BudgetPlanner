@@ -89,9 +89,27 @@ public class CustomerAuthenticationStateProvide : AuthenticationStateProvider
         return new AuthenticationState(user);
     }
 
-    public Task<CustomerModel> RegisterAsync(CustomerModel customer)
+    public async Task<CustomerModel> RegisterAsync(string email, string password, string username)
     {
-        throw new NotImplementedException();
+        string[] defaultDetail = ["An unknown error occurred."];
+
+        try
+        {
+            var result = await _firebaseAuthClient.CreateUserWithEmailAndPasswordAsync(email, password,
+                username);
+            return new CustomerModel
+            {
+                Email = email,
+                Password = password,
+                Username = username,
+                Id = result.User.Uid
+            };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public async Task<CustomerModel> LoginAsync(CustomerModel customer)
@@ -116,13 +134,20 @@ public class CustomerAuthenticationStateProvide : AuthenticationStateProvider
         return null;
     }
 
-    public Task LogoutAsync()
+    public async Task LogoutAsync()
     {
-        throw new NotImplementedException();
+        await _localStorageService.RemoveItemAsync("userAuth");
+
+        if (_firebaseAuthClient?.User != null)
+        {
+            _firebaseAuthClient.SignOut();
+        }
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
-    public Task<bool> CheckAuthenticatedAsync()
+    public async Task<bool> CheckAuthenticatedAsync()
     {
-        throw new NotImplementedException();
+        await GetAuthenticationStateAsync();
+        return _authenticated;
     }
 }
