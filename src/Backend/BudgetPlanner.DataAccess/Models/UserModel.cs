@@ -3,7 +3,7 @@
 namespace BudgetPlanner.DataAccess.Models;
 
 [FirestoreData]
-public class CustomerModel
+public class UserModel
 {
     [FirestoreDocumentId]
     public string Id { get; set; }

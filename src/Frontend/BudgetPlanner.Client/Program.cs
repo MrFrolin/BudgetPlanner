@@ -1,7 +1,10 @@
+using Blazored.LocalStorage;
 using BudgetPlanner.Client.Components;
 using BudgetPlanner.Client.Services;
+using BudgetPlanner.Client.Services.Auth;
 using BudgetPlanner.Shared.DTOs;
 using BudgetPlanner.Shared.Interfaces;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BudgetPlanner.Client
 {
@@ -21,7 +24,20 @@ namespace BudgetPlanner.Client
                 client.BaseAddress = new Uri(localhostUrl);
             });
 
-            builder.Services.AddScoped<IRepository<BudgetDTO>, BudgetService>();
+            builder.Services.AddScoped<CustomAuthenticationStateProvide>();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvide>();
+
+            builder.Services.AddBlazoredLocalStorage();
+
+            builder.Services.AddSingleton<IRepository<BudgetDTO>, BudgetService>();
+            builder.Services.AddSingleton<IRepository<UserDTO>, UserService>();
+
+
+            builder.Services.AddScoped<CookieStorageAccessor>();
+
+            
+            
+
 
             var app = builder.Build();
 

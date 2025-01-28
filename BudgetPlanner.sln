@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{5B0FCE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BudgetPlanner.Shared", "src\Shared\BudgetPlanner.Shared\BudgetPlanner.Shared.csproj", "{25E0D5B6-E409-44D6-871C-C14D5CF07BAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BudgetPlanner.Client", "src\Frontend\BudgetPlanner.Client\BudgetPlanner.Client.csproj", "{F972F426-6B4E-4809-BF72-41A2CBE90A53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BudgetPlanner.Client", "src\Frontend\BudgetPlanner.Client\BudgetPlanner.Client.csproj", "{F972F426-6B4E-4809-BF72-41A2CBE90A53}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

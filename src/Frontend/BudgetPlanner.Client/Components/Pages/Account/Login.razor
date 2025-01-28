@@ -1,0 +1,28 @@
+﻿@page "/login"
+@rendermode InteractiveServer
+@inject IAccountManagement account
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager navigationManager
+
+@code {
+    private string _spinnerClass = "";
+    private SignInDTO _signInDtoModel = new();
+    private string[] _errors = [];
+
+    private async Task LoginUser()
+    {
+        _spinnerClass = "spinner-border spinner-border-sm";
+        // // var result = await account.LoginAsync(_signInDtoModel.Email, _signInDtoModel.Password);
+        // if (result != null)
+        // {
+        //     await localStorage.SetItemAsync("authToken", result.Id); //korrigera till token typ
+        //     navigationManager.NavigateTo("/");
+        // }
+        // else
+        // {
+        //     _spinnerClass = "";
+        //     _errors = new string[] { "Invalid email or password" };
+        // }
+
+    }
+}

@@ -1,7 +1,72 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@inject CookieStorageAccessor CookieStorageAccessor
+@inject CustomAuthenticationStateProvide CustomAuthenticationStateProvider
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+<h3>Local Storage Example</h3>
+
+<button @onclick="SaveToLocalStorage">Set authKey</button>
+<button @onclick="LoadFromLocalStorage">Get authKey</button>
+
+<button @onclick="Login">Login</button>
+
+
+
+
+@code {
+    private async Task SaveToLocalStorage()
+    {
+        var credential = new CredentialDTO
+        {
+            Created = DateTime.Now,
+            ExpiresIn = 24,
+            IdToken = "PhilipToken",
+            ProviderType = 1,
+            RefereshToken = "PhilipRefreshToken",
+        };
+
+        
+        await CookieStorageAccessor.SetValueAsync<CredentialDTO>("userAuth", credential);
+
+
+       
+    }
+
+    private async Task LoadFromLocalStorage()
+    {
+        try
+        {
+            var credential = await CookieStorageAccessor.GetValueAsync("userAuth");
+
+            if (credential != null)
+            {
+                Console.WriteLine($"Loaded Credential: {credential}");
+            }
+            else
+            {
+                Console.WriteLine("No credential found in local storage.");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"ERROR IN THE LOAD FROM COOOKIE: {e}");
+            throw;
+        }
+    }
+
+    
+
+    private async Task Login()
+    {
+        var user = new UserDTO
+        {
+            Id = "PhilipUSER"
+        };
+
+        await CustomAuthenticationStateProvider.LoginAsync(user);
+    }
+
+}
+

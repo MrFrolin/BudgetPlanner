@@ -4,13 +4,16 @@ using System.Text.Json;
 using Blazored.LocalStorage;
 using BudgetPlanner.DataAccess.CustomerAuth.Models;
 using BudgetPlanner.DataAccess.Models;
+using BudgetPlanner.DataAccess.Repositories.Customers;
+using BudgetPlanner.DataAccess.UnitOfWork;
+using BudgetPlanner.Shared.DTOs;
 using Firebase.Auth;
 using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json;
 
 namespace BudgetPlanner.DataAccess.CustomerAuth;
 
-public class CustomerAuthenticationStateProvide : AuthenticationStateProvider
+public class CustomAuthenticationStateProvide : AuthenticationStateProvider
     , IAccountManagement
 {
 
@@ -32,7 +35,7 @@ public class CustomerAuthenticationStateProvide : AuthenticationStateProvider
         {"IsUser", "User"}
     };
 
-    public CustomerAuthenticationStateProvide(FirebaseAuthClient firebaseAuthClient, ILocalStorageService localStorageService, HttpClient httpClient)
+    public CustomAuthenticationStateProvide(FirebaseAuthClient firebaseAuthClient, ILocalStorageService localStorageService, HttpClient httpClient)
     {
         _firebaseAuthClient = firebaseAuthClient;
         _localStorageService = localStorageService;
@@ -75,7 +78,7 @@ public class CustomerAuthenticationStateProvide : AuthenticationStateProvider
                     claims.Add(new(ClaimTypes.Role, role));
                 }
 
-                var id = new ClaimsIdentity(claims, nameof(CustomerAuthenticationStateProvide));
+                var id = new ClaimsIdentity(claims, nameof(CustomAuthenticationStateProvide));
                 user = new ClaimsPrincipal(id);
                 _authenticated = true;
             }
@@ -89,7 +92,7 @@ public class CustomerAuthenticationStateProvide : AuthenticationStateProvider
         return new AuthenticationState(user);
     }
 
-    public async Task<CustomerModel> RegisterAsync(string email, string password, string username)
+    public async Task<UserDTO> RegisterAsync(string email, string password, string username)
     {
         string[] defaultDetail = ["An unknown error occurred."];
 
@@ -97,7 +100,7 @@ public class CustomerAuthenticationStateProvide : AuthenticationStateProvider
         {
             var result = await _firebaseAuthClient.CreateUserWithEmailAndPasswordAsync(email, password,
                 username);
-            return new CustomerModel
+            return new UserDTO
             {
                 Email = email,
                 Password = password,
@@ -112,17 +115,17 @@ public class CustomerAuthenticationStateProvide : AuthenticationStateProvider
         }
     }
 
-    public async Task<CustomerModel> LoginAsync(CustomerModel customer)
+    public async Task<UserModel> LoginAsync(UserModel user)
     {
         try
         {
-            var result = await _firebaseAuthClient.SignInWithEmailAndPasswordAsync(customer.Email, customer.Password);
+            var result = await _firebaseAuthClient.SignInWithEmailAndPasswordAsync(user.Email, user.Password);
             if (!string.IsNullOrWhiteSpace(result.User.Uid))
             {
                 await _localStorageService.SetItemAsync("userAuth", result.User.Credential);
                 NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
 
-                return customer;
+                return user;
             }
         }
         catch (Exception e)
