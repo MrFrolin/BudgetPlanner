@@ -12,6 +12,7 @@ public class BudgetService(IHttpClientFactory factory) : IRepository<BudgetDTO>
 
     public async Task<BudgetDTO> GetByIdAsync(string id)
     {
+
         var response = await _httpClient.GetAsync($"budget/{id}");
         if (!response.IsSuccessStatusCode)
         {

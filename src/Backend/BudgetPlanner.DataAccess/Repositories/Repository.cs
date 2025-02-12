@@ -59,6 +59,9 @@ public class Repository<T> : IRepository<T> where T : class
         WriteBatch batch = _firebaseDb.StartBatch();
 
         var docRef = _firebaseDb.Collection(_collection).Document();
+
+        //docRef.Id = item.GetType().GetProperty("Id").GetValue(item).ToString();
+
         batch.Create(docRef, item);
         await batch.CommitAsync();
 

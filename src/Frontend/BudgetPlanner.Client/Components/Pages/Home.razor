@@ -1,13 +1,13 @@
 ﻿@page "/"
 @rendermode InteractiveServer
-@inject CookieStorageAccessor CookieStorageAccessor
-@inject CustomAuthenticationStateProvide CustomAuthenticationStateProvider
+@inject IAccountManagement CustomAuthenticationStateProvider
 
 
 
 <h3>Local Storage Example</h3>
 
-<button @onclick="SaveToLocalStorage">Set authKey</button>
+
+<button @onclick="Register">Register</button>
 <button @onclick="LoadFromLocalStorage">Get authKey</button>
 
 <button @onclick="Login">Login</button>
@@ -16,44 +16,14 @@
 
 
 @code {
-    private async Task SaveToLocalStorage()
+    private async Task Register()
     {
-        var credential = new CredentialDTO
-        {
-            Created = DateTime.Now,
-            ExpiresIn = 24,
-            IdToken = "PhilipToken",
-            ProviderType = 1,
-            RefereshToken = "PhilipRefreshToken",
-        };
-
-        
-        await CookieStorageAccessor.SetValueAsync<CredentialDTO>("userAuth", credential);
-
-
-       
+        await CustomAuthenticationStateProvider.RegisterAsync("Korv@hotmail.com", "123korv", "korven");
     }
 
     private async Task LoadFromLocalStorage()
     {
-        try
-        {
-            var credential = await CookieStorageAccessor.GetValueAsync("userAuth");
-
-            if (credential != null)
-            {
-                Console.WriteLine($"Loaded Credential: {credential}");
-            }
-            else
-            {
-                Console.WriteLine("No credential found in local storage.");
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"ERROR IN THE LOAD FROM COOOKIE: {e}");
-            throw;
-        }
+        var authKey = await CustomAuthenticationStateProvider.CheckAuthenticatedAsync();
     }
 
     
@@ -62,7 +32,9 @@
     {
         var user = new UserDTO
         {
-            Id = "PhilipUSER"
+            Id = "PhilipUSER",
+            Password = "123korv",
+            Email = "Korv@hotmail.com"
         };
 
         await CustomAuthenticationStateProvider.LoginAsync(user);

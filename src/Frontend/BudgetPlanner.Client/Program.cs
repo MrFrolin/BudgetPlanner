@@ -4,6 +4,8 @@ using BudgetPlanner.Client.Services;
 using BudgetPlanner.Client.Services.Auth;
 using BudgetPlanner.Shared.DTOs;
 using BudgetPlanner.Shared.Interfaces;
+using Firebase.Auth;
+using Firebase.Auth.Providers;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BudgetPlanner.Client
@@ -24,20 +26,27 @@ namespace BudgetPlanner.Client
                 client.BaseAddress = new Uri(localhostUrl);
             });
 
-            builder.Services.AddScoped<CustomAuthenticationStateProvide>();
-            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvide>();
+            var firebaseAuthAPIKey = builder.Configuration["FirebaseAuthConfig:APIKey"];
+            var authDomain = builder.Configuration["FirebaseAuthConfig:AuthDomain"];
+
+            builder.Services.AddSingleton(new FirebaseAuthClient(new FirebaseAuthConfig()
+            {
+                ApiKey = firebaseAuthAPIKey,
+                AuthDomain = authDomain,
+                Providers = [
+                    new EmailProvider()
+                ]
+            }));
+
+            builder.Services.AddScoped<CookieStorageAccessor>();
+
+            builder.Services.AddScoped<IAccountManagement, AccountManagement>();
+            builder.Services.AddScoped<AuthenticationStateProvider, AccountManagement>();
 
             builder.Services.AddBlazoredLocalStorage();
 
             builder.Services.AddSingleton<IRepository<BudgetDTO>, BudgetService>();
             builder.Services.AddSingleton<IRepository<UserDTO>, UserService>();
-
-
-            builder.Services.AddScoped<CookieStorageAccessor>();
-
-            
-            
-
 
             var app = builder.Build();
 

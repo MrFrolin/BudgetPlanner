@@ -1,7 +1,6 @@
-﻿namespace BudgetPlanner.Client.Services.Auth.Models;
+﻿namespace BudgetPlanner.Shared.DTOs;
 
-
-public class UserInfo
+public class UserInfoDTO
 {
     public User[] Users { get; set; }
 }

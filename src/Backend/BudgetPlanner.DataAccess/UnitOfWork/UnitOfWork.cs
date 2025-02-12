@@ -1,7 +1,4 @@
-﻿using Blazored.LocalStorage;
-using BudgetPlanner.DataAccess;
-using BudgetPlanner.DataAccess.CustomerAuth;
-using BudgetPlanner.DataAccess.Repositories.Budgets;
+﻿using BudgetPlanner.DataAccess.Repositories.Budgets;
 using BudgetPlanner.DataAccess.Repositories.Customers;
 using BudgetPlanner.DataAccess.Repositories.Transactions;
 using Google.Cloud.Firestore;
@@ -19,7 +16,6 @@ public interface IUnitOfWork
 public class UnitOfWork : IUnitOfWork
 {
     private readonly FirestoreDb _firebaseDb;
-    private readonly ILocalStorageService _localStorage;
 
     public IBudgetRepository Budgets { get; set; }
     public IUserRepository Users { get; set; }
