@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /src/Frontend/BudgetPlanner.Client/appsettings.json
 /src/Frontend/BudgetPlanner.Client/appsettings.json
 /src/Backend/BudgetPlanner.Server/Properties/launchSettings.json
+/src/Backend/BudgetPlanner.Server/appsettings.json
