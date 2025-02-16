@@ -9,6 +9,7 @@ using FirebaseAdmin.Auth;
 using Newtonsoft.Json;
 using UserInfo = BudgetPlanner.DataAccess.CustomerAuth.Models.UserInfo;
 using Google.Apis.Auth;
+using User = BudgetPlanner.DataAccess.CustomerAuth.Models.User;
 
 namespace BudgetPlanner.Server.Services;
 
@@ -67,16 +68,26 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
             var client = _httpClient.CreateClient("ProviderAPI");
             var userResponse = await client.GetAsync($"");
 
+            userResponse.EnsureSuccessStatusCode();
+            var userJson = await userResponse.Content.ReadAsStringAsync();
+            var userInfo = System.Text.Json.JsonSerializer.Deserialize<UserInfo>(userJson, jsonSerializerOptions);
+
+
+
+            //ny implementation
             FirebaseToken decodedToken = await FirebaseAuth.DefaultInstance
                 .VerifyIdTokenAsync(idToken);
             string uid = decodedToken.Uid;
 
-            var FireBaseUser = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+            var firebaseUser = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
 
-            userResponse.EnsureSuccessStatusCode();
-            var userJson = await userResponse.Content.ReadAsStringAsync();
-
-            var userInfo = System.Text.Json.JsonSerializer.Deserialize<UserInfo>(userJson, jsonSerializerOptions);
+            var tet = new User
+            {
+                LocalId = new Guid().ToString(),
+                Email = firebaseUser.Email,
+                DisplayName = firebaseUser.DisplayName,
+                CustomAttributes = JsonConvert.SerializeObject(firebaseUser.CustomClaims)
+            };
 
             if (userInfo != null)
             {
@@ -173,9 +184,6 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
                 ExpiresIn = firebaseCredential.ExpiresIn,
                 ProviderType = 3600
             };
-
-
-
 
                 NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
                 return credential;

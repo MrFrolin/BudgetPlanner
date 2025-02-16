@@ -63,7 +63,7 @@ public class AccountManagement : AuthenticationStateProvider, IAccountManagement
             var credential = await _cookieService.GetValueAsync("userAuth");
 
             //Skicka till backend och google provider för att kontrollera token
-            var client = _httpClient.CreateClient("ProviderAPI");
+            var client = _httpClient.CreateClient("BudgetPlannerAPI");
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", credential.IdToken);
             var userResponse = await client.PostAsync("checkToken", null);
 
@@ -77,7 +77,7 @@ public class AccountManagement : AuthenticationStateProvider, IAccountManagement
             {
                 var claims = new List<Claim>
                 {
-                    new(ClaimTypes.Name, userInfo.Users.FirstOrDefault().Email),
+                    new(ClaimTypes.Name, userInfo.Users.FirstOrDefault().DisplayName),
                     new(ClaimTypes.Email, userInfo.Users.FirstOrDefault().Email),
                 };
 
