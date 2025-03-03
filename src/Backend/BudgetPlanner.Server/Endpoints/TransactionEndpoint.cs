@@ -30,13 +30,13 @@ public static class TransactionEndpoint
         return Results.Ok(transactions);
     }
 
-    private static async Task<IResult> GetTransactionById(IUnitOfWork unitOfWork, string id)
+    private static async Task<IResult> GetTransactionById(IUnitOfWork unitOfWork, string docId)
     {
-        var transaction = await unitOfWork.Transactions.GetByIdAsync(id);
+        var transaction = await unitOfWork.Transactions.GetByIdAsync(docId);
 
         if (transaction == null)
         {
-            return Results.NotFound($"Transaction with Id {id} not found.");
+            return Results.NotFound($"Transaction with Id {docId} not found.");
         }
         return Results.Ok(transaction);
     }
@@ -55,28 +55,28 @@ public static class TransactionEndpoint
         return Results.Created($"/transaction/{transaction.Id}", transaction);
     }
 
-    private static async Task<IResult> UpdateTransaction(IUnitOfWork unitOfWork, TransactionModel updTransaction, string id)
+    private static async Task<IResult> UpdateTransaction(IUnitOfWork unitOfWork, TransactionModel updTransaction, string docId)
     {
-        var existingTransaction = await unitOfWork.Transactions.GetByIdAsync(id);
+        var existingTransaction = await unitOfWork.Transactions.GetByIdAsync(docId);
         if (existingTransaction == null)
         {
-            return Results.NotFound($"Transaction with Id {id} not found.");
+            return Results.NotFound($"Transaction with Id {docId} not found.");
         }
 
-        await unitOfWork.Transactions.UpdateAsync(updTransaction, id);
+        await unitOfWork.Transactions.UpdateAsync(updTransaction, docId);
         return Results.Ok();
     }
 
-    private static async Task<IResult> DeleteTransaction(IUnitOfWork unitOfWork, string id)
+    private static async Task<IResult> DeleteTransaction(IUnitOfWork unitOfWork, string docId)
     {
-        var transactions = await unitOfWork.Transactions.GetByIdAsync(id);
+        var transactions = await unitOfWork.Transactions.GetByIdAsync(docId);
 
         if (transactions == null)
         {
             return Results.NotFound("No transactions found.");
         }
 
-        await unitOfWork.Transactions.RemoveAsync(id);
+        await unitOfWork.Transactions.RemoveAsync(docId);
         return Results.Ok();
     }
 }

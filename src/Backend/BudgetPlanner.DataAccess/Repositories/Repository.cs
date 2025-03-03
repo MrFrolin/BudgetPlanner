@@ -20,9 +20,9 @@ public class Repository<T> : IRepository<T> where T : class
         _collection = collection;
     }
 
-    public async Task<T> GetByIdAsync(string id)
+    public async Task<T> GetByIdAsync(string docId)
     {
-        var docRef = await _firebaseDb.Collection(_collection).Document(id).GetSnapshotAsync();
+        var docRef = await _firebaseDb.Collection("Users").Document("uid").Collection(_collection).Document(docId).GetSnapshotAsync();
         if (!docRef.Exists)
         {
             return null;
@@ -58,9 +58,7 @@ public class Repository<T> : IRepository<T> where T : class
     {
         WriteBatch batch = _firebaseDb.StartBatch();
 
-        var docRef = _firebaseDb.Collection(_collection).Document();
-
-        //docRef.Id = item.GetType().GetProperty("Id").GetValue(item).ToString();
+        var docRef = _firebaseDb.Collection("Users").Document("uid").Collection(_collection).Document();
 
         batch.Create(docRef, item);
         await batch.CommitAsync();
@@ -68,20 +66,20 @@ public class Repository<T> : IRepository<T> where T : class
         return docRef.Id;
     }
 
-    public async Task UpdateAsync(T updItem, string id)
+    public async Task UpdateAsync(T updItem, string docId)
     {
         WriteBatch batch = _firebaseDb.StartBatch();
 
-        var docRef = _firebaseDb.Collection(_collection).Document(id);
+        var docRef = _firebaseDb.Collection("Users").Document("uid").Collection(_collection).Document(docId);
         batch.Set(docRef, updItem, SetOptions.MergeAll);
         await batch.CommitAsync();
     }
 
-    public async Task RemoveAsync(string id)
+    public async Task RemoveAsync(string docId)
     {
         WriteBatch batch = _firebaseDb.StartBatch();
 
-        var docRef = _firebaseDb.Collection(_collection).Document(id);
+        var docRef = _firebaseDb.Collection("Users").Document("uid").Collection(_collection).Document(docId);
         batch.Delete(docRef);
         await batch.CommitAsync();
     }

@@ -1,9 +1,6 @@
 ﻿using BudgetPlanner.DataAccess.Models;
-using BudgetPlanner.DataAccess.Repositories;
-using BudgetPlanner.DataAccess.Repositories.Budgets;
 using BudgetPlanner.DataAccess.UnitOfWork;
-using Google.Type;
-using DateTime = System.DateTime;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BudgetPlanner.Server.Endpoints;
 
@@ -29,13 +26,13 @@ public static class BudgetEndpoint
         return Results.Ok(budgets);
     }
 
-    private static async Task<IResult> GetBudgetById(IUnitOfWork unitOfWork, string id)
+    private static async Task<IResult> GetBudgetById(IUnitOfWork unitOfWork, string docId)
     {
-        var budget = await unitOfWork.Budgets.GetByIdAsync(id);
+        var budget = await unitOfWork.Budgets.GetByIdAsync(docId);
 
         if (budget == null)
         {
-            return Results.NotFound($"Budget with Id {id} not found.");
+            return Results.NotFound($"Budget with Id {docId} not found.");
         }
 
         return Results.Ok(budget);
@@ -54,29 +51,29 @@ public static class BudgetEndpoint
         return Results.Ok(budget);
     }
 
-    private static async Task<IResult> UpdateBudget(IUnitOfWork unitOfWork, BudgetModel budget, string id)
+    private static async Task<IResult> UpdateBudget(IUnitOfWork unitOfWork, BudgetModel budget, string docId)
     {
-        var existingBudget = await unitOfWork.Budgets.GetByIdAsync(id);
+        var existingBudget = await unitOfWork.Budgets.GetByIdAsync(docId);
         if (existingBudget == null)
         {
-            return Results.NotFound($"Budget with Id {id} not found.");
+            return Results.NotFound($"Budget with Id {docId} not found.");
         }
 
-        budget.Id = id;
-        await unitOfWork.Budgets.UpdateAsync(budget, id);
+        budget.Id = docId;
+        await unitOfWork.Budgets.UpdateAsync(budget, docId);
 
         return Results.Ok(budget);
     }
 
-    private static async Task<IResult> DeleteBudget(IUnitOfWork unitOfWork, string id)
+    private static async Task<IResult> DeleteBudget(IUnitOfWork unitOfWork, string docId)
     {
-        var budget = await unitOfWork.Budgets.GetByIdAsync(id);
+        var budget = await unitOfWork.Budgets.GetByIdAsync(docId);
         if (budget == null)
         {
-            return Results.NotFound($"Budget with Id {id} not found.");
+            return Results.NotFound($"Budget with Id {docId} not found.");
         }
 
-        await unitOfWork.Budgets.RemoveAsync(id);
+        await unitOfWork.Budgets.RemoveAsync(docId);
 
         return Results.Ok();
     }

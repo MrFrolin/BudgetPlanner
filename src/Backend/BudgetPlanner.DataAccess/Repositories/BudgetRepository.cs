@@ -1,17 +1,15 @@
 ﻿using BudgetPlanner.DataAccess.Models;
+using BudgetPlanner.Shared.Interfaces;
 using Google.Cloud.Firestore;
-using Newtonsoft.Json;
 
-namespace BudgetPlanner.DataAccess.Repositories.Budgets;
+namespace BudgetPlanner.DataAccess.Repositories;
 
+public interface IBudgetRepository : IRepository<BudgetModel>
+{
+}
 public class BudgetRepository : Repository<BudgetModel>, IBudgetRepository
 {
-    private readonly FirestoreDb _firebaseDb;
-    private readonly string _collection;
-
     public BudgetRepository(FirestoreDb context, string collection) : base(context, collection)
     {
-        _firebaseDb = context;
-        _collection = collection;
     }
 }

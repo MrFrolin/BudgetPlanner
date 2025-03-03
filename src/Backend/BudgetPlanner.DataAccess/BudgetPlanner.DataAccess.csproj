@@ -13,10 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Repositories\Budgets\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Shared\BudgetPlanner.Shared\BudgetPlanner.Shared.csproj" />
   </ItemGroup>
 

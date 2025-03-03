@@ -71,8 +71,6 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
                 _cache.Set("userAuth", idToken, TimeSpan.FromSeconds(3600));
             }
 
-            Console.WriteLine(idToken);
-
             FirebaseToken decodedToken = await FirebaseAuth.DefaultInstance
                 .VerifyIdTokenAsync(idToken);
 
@@ -90,8 +88,8 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
                         Email = firebaseUser.Email,
                         DisplayName = firebaseUser.DisplayName,
                         CustomAttributes = firebaseUser.CustomClaims.Count > 0
-                            ? JsonConvert.SerializeObject(firebaseUser.CustomClaims) // Convert claims to JSON
-                            : "{}" // Empty JSON if no custom claims exist
+                            ? JsonConvert.SerializeObject(firebaseUser.CustomClaims)
+                            : "{}"
                     }
                 }
             };

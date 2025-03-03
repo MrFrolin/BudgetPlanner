@@ -26,14 +26,14 @@ public static class UserEndpoint
         return Results.Ok(customers);
     }
 
-    private static async Task<IResult> GetUserById(IUnitOfWork unitOfWork, string id)
+    private static async Task<IResult> GetUserById(IUnitOfWork unitOfWork, string docId)
     {
 
-        var customer = await unitOfWork.Users.GetByIdAsync(id);
+        var customer = await unitOfWork.Users.GetByIdAsync(docId);
 
         if (customer == null)
         {
-            return Results.NotFound($"Customer with Id {id} not found.");
+            return Results.NotFound($"Customer with Id {docId} not found.");
         }
 
         return Results.Ok(customer);
@@ -53,27 +53,27 @@ public static class UserEndpoint
         return Results.Created($"/user/{customerId}", newUser);
     }
 
-    private static async Task<IResult> UpdateUser(IUnitOfWork unitOfWork, UserModel updUser, string id)
+    private static async Task<IResult> UpdateUser(IUnitOfWork unitOfWork, UserModel updUser, string docId)
     {
-        var existingCustomer = await unitOfWork.Users.GetByIdAsync(id);
+        var existingCustomer = await unitOfWork.Users.GetByIdAsync(docId);
         if (existingCustomer == null)
         {
-            return Results.NotFound($"Customer with Id {id} not found.");
+            return Results.NotFound($"Customer with Id {docId} not found.");
         }
 
-        await unitOfWork.Users.UpdateAsync(updUser, id);
+        await unitOfWork.Users.UpdateAsync(updUser, docId);
         return Results.Ok();
     }
 
-    private static async Task<IResult> DeleteUser(IUnitOfWork unitOfWork, string id)
+    private static async Task<IResult> DeleteUser(IUnitOfWork unitOfWork, string docId)
     {
-        var existingCustomer = await unitOfWork.Users.GetByIdAsync(id);
+        var existingCustomer = await unitOfWork.Users.GetByIdAsync(docId);
         if (existingCustomer == null)
         {
-            return Results.NotFound($"Customer with Id {id} not found.");
+            return Results.NotFound($"Customer with Id {docId} not found.");
         }
 
-        await unitOfWork.Users.RemoveAsync(id);
+        await unitOfWork.Users.RemoveAsync(docId);
         return Results.Ok();
     }
 }

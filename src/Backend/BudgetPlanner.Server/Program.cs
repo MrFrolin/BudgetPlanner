@@ -5,7 +5,6 @@ using BudgetPlanner.Server.Services;
 using Firebase.Auth;
 using Firebase.Auth.Providers;
 using FirebaseAdmin;
-using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -79,42 +78,13 @@ builder.Services.AddCors(options =>
             .WithOrigins("https://localhost:7236")
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowCredentials());  // This is essential for sending cookies.
+            .AllowCredentials());
 });
-
-
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
-
-//// Middleware to validate the token gets called before every endpoint call
-//app.Use(async (context, next) =>
-//{
-//    var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-
-//    if (string.IsNullOrEmpty(token))
-//    {
-//        context.Response.StatusCode = 401;
-//        await context.Response.WriteAsync("Missing or invalid token");
-//        return;
-//    }
-
-//    FirebaseToken decodedToken = await FirebaseAuth.DefaultInstance
-//        .VerifyIdTokenAsync(token);
-
-//    if (decodedToken.Audience != projectId)
-//    {
-//        context.Response.StatusCode = 401;
-//        await context.Response.WriteAsync("Invalid or expired token");
-//        return;
-//    }
-
-//    await next.Invoke();
-//});
-
 
 app.UseCors("budgetPlanner");
 

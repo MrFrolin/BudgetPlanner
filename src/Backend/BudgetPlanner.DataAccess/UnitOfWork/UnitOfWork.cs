@@ -1,6 +1,4 @@
-﻿using BudgetPlanner.DataAccess.Repositories.Budgets;
-using BudgetPlanner.DataAccess.Repositories.Customers;
-using BudgetPlanner.DataAccess.Repositories.Transactions;
+﻿using BudgetPlanner.DataAccess.Repositories;
 using Google.Cloud.Firestore;
 
 namespace BudgetPlanner.DataAccess.UnitOfWork;
