@@ -7,7 +7,7 @@ public static class UserEndpoint
 {
     public static IEndpointRouteBuilder MapUserEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("user");
+        var group = app.MapGroup("user").RequireAuthorization();
 
         group.MapGet("/", GetAllUsers);
         group.MapGet("/{id}", GetUserById);
@@ -28,6 +28,7 @@ public static class UserEndpoint
 
     private static async Task<IResult> GetUserById(IUnitOfWork unitOfWork, string id)
     {
+
         var customer = await unitOfWork.Users.GetByIdAsync(id);
 
         if (customer == null)

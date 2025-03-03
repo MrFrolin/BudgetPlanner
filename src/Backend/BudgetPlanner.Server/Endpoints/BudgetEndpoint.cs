@@ -11,7 +11,7 @@ public static class BudgetEndpoint
 {
     public static IEndpointRouteBuilder MapBudgetEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("budget");
+        var group = app.MapGroup("budget").RequireAuthorization();
 
         group.MapGet("/", GetAllBudgets);
         group.MapGet("/{id}", GetBudgetById);

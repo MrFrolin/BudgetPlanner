@@ -1,4 +1,4 @@
-﻿@page "/login"
+﻿@* @page "/login"
 @rendermode InteractiveServer
 @inject IAccountManagement account
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
@@ -25,4 +25,67 @@
         // }
 
     }
+} *@
+
+@page "/login"
+@inject IAccountManagement account
+@rendermode InteractiveServer
+
+<h3>Login</h3>
+
+<div class="login-container">
+    <EditForm Model="@user" OnValidSubmit="HandleLogin">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label>Email:</label>
+            <InputText @bind-Value="user.Email" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label>Password:</label>
+            <InputText @bind-Value="user.Password" type="password" class="form-control" />
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn btn-primary">Login</button>
+            <button @onclick="NavigateToRegister" class="btn btn-secondary">Register</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    private UserDTO user = new();
+
+    private async Task HandleLogin()
+    {
+        var test = await account.LoginAsync(user);
+        // Add authentication logic here
+
+        var testing = new UserDTO
+        {
+            Id = test.Id,
+            Password = test.Password,
+            Email = test.Email,
+            BudgetsId = new List<string>(),
+            TransactionIds = new List<string>()
+        };
+
+        user = testing;
+
+        // Id = "PhilipUSER",
+        // Password = "123korv",
+        // Email = "Korv@hotmail.com"
+
+
+    }
+
+    private void NavigateToRegister()
+    {
+        // Navigate to register page (update based on your routing)
+        Navigation.NavigateTo("/register");
+    }
+
+    [Inject] NavigationManager Navigation { get; set; } = default!;
 }

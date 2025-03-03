@@ -9,7 +9,12 @@ using FirebaseAdmin.Auth;
 using Newtonsoft.Json;
 using UserInfo = BudgetPlanner.DataAccess.CustomerAuth.Models.UserInfo;
 using Google.Apis.Auth;
+using Microsoft.Extensions.Caching.Memory;
 using User = BudgetPlanner.DataAccess.CustomerAuth.Models.User;
+using Firebase.Auth.Requests;
+using static Google.Rpc.Context.AttributeContext.Types;
+using System.Net.Http.Headers;
+using System.Net;
 
 namespace BudgetPlanner.Server.Services;
 
@@ -26,14 +31,12 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
 {
 
     private bool _authenticated = false;
-    private readonly ClaimsPrincipal UnAuthenticated = new(new ClaimsIdentity());
+    private readonly ClaimsPrincipal _unAuthenticated = new(new ClaimsIdentity());
 
-    private readonly IHttpClientFactory _httpClient;
+    private readonly IMemoryCache _cache;
+
     private readonly FirebaseAuthClient _firebaseAuthClient;
-    private readonly JsonSerializerOptions jsonSerializerOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-    };
+    private ITokenService _tokenService;
 
     private readonly Dictionary<string, string> keyMap = new()
     {
@@ -41,52 +44,56 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
         {"IsUser", "User"}
     };
 
-    public FirebaseAuthenticationStateProvide(IHttpClientFactory httpClient, FirebaseAuthClient firebaseAuth)
+    public FirebaseAuthenticationStateProvide(FirebaseAuthClient firebaseAuth, IMemoryCache cache, ITokenService tokenService)
     {
-        _httpClient = httpClient;
         _firebaseAuthClient = firebaseAuth;
+        _cache = cache;
+        _tokenService = tokenService;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         _authenticated = false;
-        var user = UnAuthenticated;
-
-        //var idToken = _cookieService.GetCookie("userAuth");
-
-        var idToken = "";
-
+        var user = _unAuthenticated;
 
         try
         {
-           
+            var idToken = _cache.Get("userAuth")?.ToString();
+            if (string.IsNullOrEmpty(idToken))
+            {
+                throw new Exception("No token found");
+            }
 
-            //var body = new StringContent($"{{\"idtoken\":\"{credential.IdToken}\"}}",
-            //    Encoding.UTF8, "application/json");
+            var refreshToken = _cache.Get("refresh_token")?.ToString();
+            if (_tokenService.TokenIsExpired(idToken) && !string.IsNullOrEmpty(refreshToken))
+            {
+                idToken = await _tokenService.RefreshIdTokenAsync(refreshToken);
+                _cache.Set("userAuth", idToken, TimeSpan.FromSeconds(3600));
+            }
 
-            //Check the token with provider (google)
-            var client = _httpClient.CreateClient("ProviderAPI");
-            var userResponse = await client.GetAsync($"");
+            Console.WriteLine(idToken);
 
-            userResponse.EnsureSuccessStatusCode();
-            var userJson = await userResponse.Content.ReadAsStringAsync();
-            var userInfo = System.Text.Json.JsonSerializer.Deserialize<UserInfo>(userJson, jsonSerializerOptions);
-
-
-
-            //ny implementation
             FirebaseToken decodedToken = await FirebaseAuth.DefaultInstance
                 .VerifyIdTokenAsync(idToken);
+
             string uid = decodedToken.Uid;
 
             var firebaseUser = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
 
-            var tet = new User
+            var userInfo = new UserInfo
             {
-                LocalId = new Guid().ToString(),
-                Email = firebaseUser.Email,
-                DisplayName = firebaseUser.DisplayName,
-                CustomAttributes = JsonConvert.SerializeObject(firebaseUser.CustomClaims)
+                Users = new[]
+                {
+                    new User
+                    {
+                        LocalId = firebaseUser.Uid,
+                        Email = firebaseUser.Email,
+                        DisplayName = firebaseUser.DisplayName,
+                        CustomAttributes = firebaseUser.CustomClaims.Count > 0
+                            ? JsonConvert.SerializeObject(firebaseUser.CustomClaims) // Convert claims to JSON
+                            : "{}" // Empty JSON if no custom claims exist
+                    }
+                }
             };
 
             if (userInfo != null)
@@ -122,55 +129,26 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
 
     public async Task<UserDTO> RegisterAsync(string email, string password, string username)
     {
-        //string[] defaultDetail = ["An unknown error occurred."];
-
-        //try
-        //{
-        //    var result = await _firebaseAuthClient.CreateUserWithEmailAndPasswordAsync(email, password, username);
-        //    return new UserDTO
-        //    {
-        //        Email = email,
-        //        Password = password,
-        //        Username = username,
-        //        Id = result.User.Uid
-        //    };
-        //}
-        //catch (Exception e)
-        //{
-        //    Console.WriteLine(e);
-        //    throw;
-        //}
-
-        
-
-
-        return null;
+        try
+        {
+            var result = await _firebaseAuthClient.CreateUserWithEmailAndPasswordAsync(email, password, username);
+            return new UserDTO
+            {
+                Email = email,
+                Password = password,
+                Username = username,
+                Id = result.User.Uid
+            };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public async Task<CredentialDTO> LoginAsync(UserDTO user)
     {
-        //var result = await _firebaseAuthClient.SignInWithEmailAndPasswordAsync(user.Email, user.Password);
-        //if (!string.IsNullOrWhiteSpace(result.User.Uid))
-        //{
-        //    var firebaseCredential = result.User.Credential;
-
-        //    var credential = new Credential
-        //    {
-        //        IdToken = firebaseCredential.IdToken,
-        //        RefereshToken = firebaseCredential.RefreshToken,
-        //        Created = DateTime.Now,
-        //        ExpiresIn = firebaseCredential.ExpiresIn,
-        //        ProviderType = 3600
-        //    };
-
-        //    _cookieService.SetCookie("userAuth", credential.IdToken, DateTime.Now.AddSeconds(360000));
-        //    _cookieService.SetCookie("refresh_token", firebaseCredential.RefreshToken, DateTime.Now.AddDays(30));
-
-        //    NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-
-        //    return credential;
-        //}
-
         var result = await _firebaseAuthClient.SignInWithEmailAndPasswordAsync(user.Email, user.Password);
         if (!string.IsNullOrWhiteSpace(result.User.Uid))
         {
@@ -185,27 +163,27 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
                 ProviderType = 3600
             };
 
-                NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-                return credential;
-            
+            _cache.Set("userAuth", credential.IdToken, DateTime.Now.AddSeconds(3600));
+            _cache.Set("refresh_token", firebaseCredential.RefreshToken, DateTime.Now.AddDays(30));
+
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+
+            return credential;
         }
-
-        throw new Exception("Unable to login");
-
-        return null;
+        throw new Exception("login fail, string seems to be null");
     }
 
     public Task LogoutAsync()
     {
-        //_cookieService.DeleteCookie("id_token");
-        //_cookieService.DeleteCookie("refresh_token");
+        _cache.Remove("id_token");
+        _cache.Remove("refresh_token");
 
-        //if (_firebaseAuthClient?.User != null)
-        //{
-        //    _firebaseAuthClient.SignOut();
-        //}
+        if (_firebaseAuthClient?.User != null)
+        {
+            _firebaseAuthClient.SignOut();
+        }
 
-        //NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         return Task.CompletedTask;
     }
 

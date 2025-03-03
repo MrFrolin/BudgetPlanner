@@ -20,44 +20,34 @@ public static class AccountManagementEndpoint
         return app;
     }
 
-    
-
     private static async Task<Results<Ok<UserDTO>, BadRequest<string>>> RegisterUser(IAccountManagement accountManagement, [FromBody] UserDTO registerUser)
     {
-        var result = await accountManagement.RegisterAsync(registerUser.Email, registerUser.Password, registerUser.Password);
+        var userDTO = await accountManagement.RegisterAsync(registerUser.Email, registerUser.Password, registerUser.Password);
 
-        if (result == null)
+        if (userDTO == null)
         {
             return TypedResults.BadRequest("Failed to register user.");
         }
-        return TypedResults.Ok(result);
+        return TypedResults.Ok(userDTO);
     }
 
     private static async Task<Results<Ok<CredentialDTO>, NotFound<string>>> LoginAsync(IAccountManagement accountManagement, [FromBody] UserDTO user)
     {
-        var result = await accountManagement.LoginAsync(user);
-        if (result == null)
+        var credentialDTO = await accountManagement.LoginAsync(user);
+
+        if (credentialDTO == null)
         {
             return TypedResults.NotFound("Wrong username or password");
         }
 
-        var credential = new CredentialDTO
-        {
-            IdToken = result.IdToken,
-            RefereshToken = result.RefereshToken,
-            Created = result.Created,
-            ExpiresIn = result.ExpiresIn,
-            ProviderType = result.ProviderType
-        };
-
-        return TypedResults.Ok(credential);
+        return TypedResults.Ok(credentialDTO);
     }
-    private static async Task<Ok> LogoutAsync(IAccountManagement accountManagement)
+    private static async Task<Ok<string>> LogoutAsync(IAccountManagement accountManagement)
     {
         try
         {
             await accountManagement.LogoutAsync();
-            return TypedResults.Ok();
+            return TypedResults.Ok("User logged out");
         }
         catch (Exception e)
         {
@@ -68,8 +58,8 @@ public static class AccountManagementEndpoint
 
     private static async Task<Ok<bool>> CheckAuthenticatedAsync(IAccountManagement accountManagement)
     {
-        var result = await accountManagement.CheckAuthenticatedAsync();
+        var isAuthenticated = await accountManagement.CheckAuthenticatedAsync();
 
-        return TypedResults.Ok(result);
+        return TypedResults.Ok(isAuthenticated);
     }
 }
