@@ -20,10 +20,10 @@ namespace BudgetPlanner.Server.Services;
 
 public interface IAccountManagement
 {
-    public Task<UserDTO> RegisterAsync(string email, string password, string username);
-    public Task<CredentialDTO> LoginAsync(string email, string password);
-    public Task LogoutAsync();
-    public Task<bool> CheckAuthenticatedAsync();
+    Task<UserDTO> RegisterAsync(string email, string password, string username);
+    Task<CredentialDTO> LoginAsync(string email, string password);
+    void LogoutAsync();
+    Task<bool> CheckAuthenticatedAsync();
 }
 
 public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
@@ -173,7 +173,7 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
         throw new Exception("login fail, string seems to be null");
     }
 
-    public Task LogoutAsync()
+    public void LogoutAsync()
     {
         _cache.Remove("id_token");
         _cache.Remove("refresh_token");
@@ -182,9 +182,7 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
         {
             _firebaseAuthClient.SignOut();
         }
-
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-        return Task.CompletedTask;
     }
 
     public async Task<bool> CheckAuthenticatedAsync()

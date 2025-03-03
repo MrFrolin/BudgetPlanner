@@ -44,7 +44,7 @@ public static class AccountManagementEndpoint
     {
         try
         {
-            await accountManagement.LogoutAsync();
+            accountManagement.LogoutAsync();
             return TypedResults.Ok("User logged out");
         }
         catch (Exception e)
