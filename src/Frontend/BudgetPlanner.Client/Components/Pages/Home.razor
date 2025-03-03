@@ -37,7 +37,7 @@
             Email = "Korv@hotmail.com"
         };
 
-        await CustomAuthenticationStateProvider.LoginAsync(user);
+        await CustomAuthenticationStateProvider.LoginAsync(user.Email, user.Password);
     }
 
 }

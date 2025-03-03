@@ -60,7 +60,7 @@
 
     private async Task HandleLogin()
     {
-        var test = await account.LoginAsync(user);
+        var test = await account.LoginAsync(user.Email, user.Password);
         // Add authentication logic here
 
         var testing = new UserDTO

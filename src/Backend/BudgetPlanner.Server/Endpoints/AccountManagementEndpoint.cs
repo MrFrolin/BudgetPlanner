@@ -1,8 +1,6 @@
-﻿using BudgetPlanner.DataAccess.CustomerAuth;
-using BudgetPlanner.Server.Services;
+﻿using BudgetPlanner.Server.Services;
 using BudgetPlanner.Shared.DTOs;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BudgetPlanner.Server.Endpoints;
 
@@ -20,9 +18,9 @@ public static class AccountManagementEndpoint
         return app;
     }
 
-    private static async Task<Results<Ok<UserDTO>, BadRequest<string>>> RegisterUser(IAccountManagement accountManagement, [FromBody] UserDTO registerUser)
+    private static async Task<Results<Ok<UserDTO>, BadRequest<string>>> RegisterUser(IAccountManagement accountManagement, string email, string password, string username)
     {
-        var userDTO = await accountManagement.RegisterAsync(registerUser.Email, registerUser.Password, registerUser.Password);
+        var userDTO = await accountManagement.RegisterAsync(email, password, username);
 
         if (userDTO == null)
         {
@@ -31,9 +29,9 @@ public static class AccountManagementEndpoint
         return TypedResults.Ok(userDTO);
     }
 
-    private static async Task<Results<Ok<CredentialDTO>, NotFound<string>>> LoginAsync(IAccountManagement accountManagement, [FromBody] UserDTO user)
+    private static async Task<Results<Ok<CredentialDTO>, NotFound<string>>> LoginAsync(IAccountManagement accountManagement, string email, string password)
     {
-        var credentialDTO = await accountManagement.LoginAsync(user);
+        var credentialDTO = await accountManagement.LoginAsync(email, password);
 
         if (credentialDTO == null)
         {

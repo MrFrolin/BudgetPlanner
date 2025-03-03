@@ -21,7 +21,7 @@ namespace BudgetPlanner.Server.Services;
 public interface IAccountManagement
 {
     public Task<UserDTO> RegisterAsync(string email, string password, string username);
-    public Task<CredentialDTO> LoginAsync(UserDTO user);
+    public Task<CredentialDTO> LoginAsync(string email, string password);
     public Task LogoutAsync();
     public Task<bool> CheckAuthenticatedAsync();
 }
@@ -147,9 +147,9 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
         }
     }
 
-    public async Task<CredentialDTO> LoginAsync(UserDTO user)
+    public async Task<CredentialDTO> LoginAsync(string email, string password)
     {
-        var result = await _firebaseAuthClient.SignInWithEmailAndPasswordAsync(user.Email, user.Password);
+        var result = await _firebaseAuthClient.SignInWithEmailAndPasswordAsync(email, password);
         if (!string.IsNullOrWhiteSpace(result.User.Uid))
         {
             var firebaseCredential = result.User.Credential;
