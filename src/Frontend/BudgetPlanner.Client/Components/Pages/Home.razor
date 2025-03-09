@@ -1,6 +1,7 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 @inject IAccountManagement CustomAuthenticationStateProvider
+@inject IUserService userService
 
 
 
@@ -18,7 +19,13 @@
 @code {
     private async Task Register()
     {
-        await CustomAuthenticationStateProvider.RegisterAsync("Korv@hotmail.com", "123korv", "korven");
+        var userDTO = await CustomAuthenticationStateProvider.RegisterAsync("test@test.com", "123lösen", "tester");
+
+        var test = await CustomAuthenticationStateProvider.LoginAsync(userDTO.Email, userDTO.Password);
+
+        Console.WriteLine("ANVÄNDARE REGISTRERAD");
+
+        await userService.AddAsync(userDTO);
     }
 
     private async Task LoadFromLocalStorage()

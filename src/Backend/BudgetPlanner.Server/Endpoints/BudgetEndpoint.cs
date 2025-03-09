@@ -1,6 +1,8 @@
 ﻿using BudgetPlanner.DataAccess.Models;
 using BudgetPlanner.DataAccess.UnitOfWork;
 using Microsoft.Extensions.Caching.Memory;
+using System.IdentityModel.Tokens.Jwt;
+using BudgetPlanner.Server.Services;
 
 namespace BudgetPlanner.Server.Endpoints;
 
@@ -11,24 +13,24 @@ public static class BudgetEndpoint
         var group = app.MapGroup("budget").RequireAuthorization();
 
         group.MapGet("/", GetAllBudgets);
-        group.MapGet("/{id}", GetBudgetById);
+        group.MapGet("/{docId}", GetBudgetById);
         group.MapPost("/", AddBudget);
-        group.MapPut("/{id}", UpdateBudget);
-        group.MapDelete("/{id}", DeleteBudget);
+        group.MapPut("/{docId}", UpdateBudget);
+        group.MapDelete("/{docId}", DeleteBudget);
 
         return app;
     }
 
-    private static async Task<IResult> GetAllBudgets(IUnitOfWork unitOfWork)
+    private static async Task<IResult> GetAllBudgets(IUnitOfWork unitOfWork, string uId)
     {
-        var budgets = await unitOfWork.Budgets.GetAllAsync();
+        var budgets = await unitOfWork.Budgets.GetAllAsync(uId);
 
         return Results.Ok(budgets);
     }
 
-    private static async Task<IResult> GetBudgetById(IUnitOfWork unitOfWork, string docId)
+    private static async Task<IResult> GetBudgetById(IUnitOfWork unitOfWork, string docId, string uId)
     {
-        var budget = await unitOfWork.Budgets.GetByIdAsync(docId);
+        var budget = await unitOfWork.Budgets.GetByIdAsync(docId, uId);
 
         if (budget == null)
         {
@@ -38,9 +40,9 @@ public static class BudgetEndpoint
         return Results.Ok(budget);
     }
 
-    private static async Task<IResult> AddBudget(IUnitOfWork unitOfWork, BudgetModel budget)
+    private static async Task<IResult> AddBudget(IUnitOfWork unitOfWork, BudgetModel budget, string uId)
     {
-        var budgetId = await unitOfWork.Budgets.AddAsync(budget);
+        var budgetId = await unitOfWork.Budgets.AddAsync(budget, uId);
         budget.Id = budgetId;
 
         if(budgetId == null)
@@ -51,29 +53,29 @@ public static class BudgetEndpoint
         return Results.Ok(budget);
     }
 
-    private static async Task<IResult> UpdateBudget(IUnitOfWork unitOfWork, BudgetModel budget, string docId)
+    private static async Task<IResult> UpdateBudget(IUnitOfWork unitOfWork, BudgetModel budget, string docId, string uId)
     {
-        var existingBudget = await unitOfWork.Budgets.GetByIdAsync(docId);
+        var existingBudget = await unitOfWork.Budgets.GetByIdAsync(docId, uId);
         if (existingBudget == null)
         {
             return Results.NotFound($"Budget with Id {docId} not found.");
         }
 
         budget.Id = docId;
-        await unitOfWork.Budgets.UpdateAsync(budget, docId);
+        await unitOfWork.Budgets.UpdateAsync(budget, docId, uId);
 
         return Results.Ok(budget);
     }
 
-    private static async Task<IResult> DeleteBudget(IUnitOfWork unitOfWork, string docId)
+    private static async Task<IResult> DeleteBudget(IUnitOfWork unitOfWork, string docId, string uId)
     {
-        var budget = await unitOfWork.Budgets.GetByIdAsync(docId);
+        var budget = await unitOfWork.Budgets.GetByIdAsync(docId, uId);
         if (budget == null)
         {
             return Results.NotFound($"Budget with Id {docId} not found.");
         }
 
-        await unitOfWork.Budgets.RemoveAsync(docId);
+        await unitOfWork.Budgets.RemoveAsync(docId, uId);
 
         return Results.Ok();
     }

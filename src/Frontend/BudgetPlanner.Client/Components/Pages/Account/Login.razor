@@ -29,6 +29,7 @@
 
 @page "/login"
 @inject IAccountManagement account
+@inject IUserService userService
 @rendermode InteractiveServer
 
 <h3>Login</h3>
@@ -60,17 +61,19 @@
 
     private async Task HandleLogin()
     {
-        var test = await account.LoginAsync(user.Email, user.Password);
+        var uId = await account.LoginAsync(user.Email, user.Password);
         // Add authentication logic here
 
+        var userDTO = await userService.GetByIdAsync(uId);
+
         var testing = new UserDTO
-        {
-            Id = test.Id,
-            Password = test.Password,
-            Email = test.Email,
-            BudgetsId = new List<string>(),
-            TransactionIds = new List<string>()
-        };
+            {
+                Id = userDTO.Id,
+                Password = userDTO.Password,
+                Email = userDTO.Email,
+                BudgetsId = new List<string>(),
+                TransactionIds = new List<string>()
+            };
 
         user = testing;
 

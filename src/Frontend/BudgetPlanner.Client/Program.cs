@@ -29,7 +29,7 @@ namespace BudgetPlanner.Client
             builder.Services.AddScoped<IAccountManagement, AccountManagement>();
 
             builder.Services.AddSingleton<IRepository<BudgetDTO>, BudgetService>();
-            builder.Services.AddSingleton<IRepository<UserDTO>, UserService>();
+            builder.Services.AddSingleton<IUserService, UserService>();
 
             var app = builder.Build();
 

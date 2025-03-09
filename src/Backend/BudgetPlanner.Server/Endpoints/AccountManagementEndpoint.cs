@@ -1,4 +1,5 @@
 ﻿using BudgetPlanner.Server.Services;
+using BudgetPlanner.Server.Services.Middleware;
 using BudgetPlanner.Shared.DTOs;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -8,7 +9,7 @@ public static class AccountManagementEndpoint
 {
     public static IEndpointRouteBuilder MapAccountManagementEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("account");
+        var group = app.MapGroup("account").WithMetadata(new AllowAnonymousAttribute());
 
         group.MapPost("/login", LoginAsync);
         group.MapPost("/register", RegisterUser);
@@ -18,9 +19,9 @@ public static class AccountManagementEndpoint
         return app;
     }
 
-    private static async Task<Results<Ok<UserDTO>, BadRequest<string>>> RegisterUser(IAccountManagement accountManagement, string email, string password, string username)
+    private static async Task<Results<Ok<UserDTO>, BadRequest<string>>> RegisterUser(IAccountManagement accountManagement, UserDTO regUser)
     {
-        var userDTO = await accountManagement.RegisterAsync(email, password, username);
+        var userDTO = await accountManagement.RegisterAsync(regUser.Email, regUser.Password, regUser.Username);
 
         if (userDTO == null)
         {
@@ -29,16 +30,16 @@ public static class AccountManagementEndpoint
         return TypedResults.Ok(userDTO);
     }
 
-    private static async Task<Results<Ok<CredentialDTO>, NotFound<string>>> LoginAsync(IAccountManagement accountManagement, string email, string password)
+    private static async Task<Results<Ok<string>, NotFound<string>>> LoginAsync(IAccountManagement accountManagement, UserDTO regUser)
     {
-        var credentialDTO = await accountManagement.LoginAsync(email, password);
+        var uId = await accountManagement.LoginAsync(regUser.Email, regUser.Password);
 
-        if (credentialDTO == null)
+        if (uId == null)
         {
             return TypedResults.NotFound("Wrong username or password");
         }
 
-        return TypedResults.Ok(credentialDTO);
+        return TypedResults.Ok(uId);
     }
     private static async Task<Ok<string>> LogoutAsync(IAccountManagement accountManagement)
     {

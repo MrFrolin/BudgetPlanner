@@ -10,10 +10,10 @@ public class BudgetService(IHttpClientFactory factory) : IRepository<BudgetDTO>
 {
     private readonly HttpClient _httpClient = factory.CreateClient("BudgetPlannerAPI");
 
-    public async Task<BudgetDTO> GetByIdAsync(string id)
+    public async Task<BudgetDTO> GetByIdAsync(string docId, string uId)
     {
 
-        var response = await _httpClient.GetAsync($"budget/{id}");
+        var response = await _httpClient.GetAsync($"budget/{docId}");
         if (!response.IsSuccessStatusCode)
         {
             throw new Exception($"Cannot retrieve data. Status code: {response.StatusCode}");
@@ -21,9 +21,9 @@ public class BudgetService(IHttpClientFactory factory) : IRepository<BudgetDTO>
         return await response.Content.ReadFromJsonAsync<BudgetDTO>();
     }
 
-    public async Task<List<BudgetDTO>> GetAllAsync()
+    public async Task<List<BudgetDTO>> GetAllAsync(string uId)
     {
-        var response = await _httpClient.GetAsync("budget");
+        var response = await _httpClient.GetAsync($"budget/{uId}");
 
         if (!response.IsSuccessStatusCode)
         {
@@ -33,9 +33,9 @@ public class BudgetService(IHttpClientFactory factory) : IRepository<BudgetDTO>
         return await response.Content.ReadFromJsonAsync<List<BudgetDTO>>();
     }
 
-    public async Task<string> AddAsync(BudgetDTO item)
+    public async Task<string> AddAsync(BudgetDTO item, string uId)
     {
-        var response = await _httpClient.PostAsJsonAsync($"/budget", item);
+        var response = await _httpClient.PostAsJsonAsync($"/budget{uId}", item);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -44,9 +44,9 @@ public class BudgetService(IHttpClientFactory factory) : IRepository<BudgetDTO>
         return await response.Content.ReadAsStringAsync();
     }
 
-    public async Task UpdateAsync(BudgetDTO item, string id)
+    public async Task UpdateAsync(BudgetDTO item, string docId, string uId)
     {
-        var response = await _httpClient.PutAsJsonAsync($"/budget/{id}", item);
+        var response = await _httpClient.PutAsJsonAsync($"/budget/{docId}", item);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -54,9 +54,9 @@ public class BudgetService(IHttpClientFactory factory) : IRepository<BudgetDTO>
         }
     }
 
-    public async Task RemoveAsync(string id)
+    public async Task RemoveAsync(string docId, string uId)
     {
-        var response = await _httpClient.DeleteAsync($"/budget/{id}");
+        var response = await _httpClient.DeleteAsync($"/budget/{docId}");
 
         if (!response.IsSuccessStatusCode)
         {

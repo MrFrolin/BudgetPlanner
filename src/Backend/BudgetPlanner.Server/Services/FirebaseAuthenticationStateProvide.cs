@@ -1,27 +1,19 @@
-﻿using BudgetPlanner.DataAccess.CustomerAuth.Models;
-using BudgetPlanner.Shared.DTOs;
+﻿using BudgetPlanner.Shared.DTOs;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
 using Firebase.Auth;
 using FirebaseAdmin.Auth;
 using Newtonsoft.Json;
 using UserInfo = BudgetPlanner.DataAccess.CustomerAuth.Models.UserInfo;
-using Google.Apis.Auth;
 using Microsoft.Extensions.Caching.Memory;
 using User = BudgetPlanner.DataAccess.CustomerAuth.Models.User;
-using Firebase.Auth.Requests;
-using static Google.Rpc.Context.AttributeContext.Types;
-using System.Net.Http.Headers;
-using System.Net;
 
 namespace BudgetPlanner.Server.Services;
 
 public interface IAccountManagement
 {
     Task<UserDTO> RegisterAsync(string email, string password, string username);
-    Task<CredentialDTO> LoginAsync(string email, string password);
+    Task<string> LoginAsync(string email, string password);
     void LogoutAsync();
     Task<bool> CheckAuthenticatedAsync();
 }
@@ -132,10 +124,12 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
             var result = await _firebaseAuthClient.CreateUserWithEmailAndPasswordAsync(email, password, username);
             return new UserDTO
             {
+                Id = result.User.Uid,
                 Email = email,
                 Password = password,
                 Username = username,
-                Id = result.User.Uid
+                BudgetsId = new List<string>(),
+                TransactionIds = new List<string>()
             };
         }
         catch (Exception e)
@@ -145,7 +139,7 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
         }
     }
 
-    public async Task<CredentialDTO> LoginAsync(string email, string password)
+    public async Task<string> LoginAsync(string email, string password)
     {
         var result = await _firebaseAuthClient.SignInWithEmailAndPasswordAsync(email, password);
         if (!string.IsNullOrWhiteSpace(result.User.Uid))
@@ -166,7 +160,7 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
 
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
 
-            return credential;
+            return result.User.Uid;
         }
         throw new Exception("login fail, string seems to be null");
     }

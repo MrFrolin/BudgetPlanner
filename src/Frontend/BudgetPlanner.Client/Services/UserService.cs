@@ -3,26 +3,35 @@ using BudgetPlanner.Shared.Interfaces;
 
 namespace BudgetPlanner.Client.Services;
 
-public class UserService(IHttpClientFactory factory) : IRepository<UserDTO>
+public interface IUserService
+{
+    Task<UserDTO> GetByIdAsync(string uId);
+    Task<List<UserDTO>> GetAllAsync(string uId);
+    Task<string> AddAsync(UserDTO item);
+    Task UpdateAsync(UserDTO item, string uId);
+    Task DeleteAsync(string uId);
+}
+
+public class UserService(IHttpClientFactory factory) : IUserService
 {
 
     private readonly HttpClient _httpClient = factory.CreateClient("BudgetPlannerAPI");
 
-    public async Task<UserDTO> GetByIdAsync(string id)
+    public async Task<UserDTO> GetByIdAsync(string docId)
     {
-        var response = await _httpClient.GetAsync($"/user/{id}");
+        var response = await _httpClient.GetAsync($"/user/{docId}");
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"Can find user with id: {id}");
+            throw new Exception($"Can find user with id: {docId}");
         }
 
         return await response.Content.ReadFromJsonAsync<UserDTO>();
     }
 
-    public async Task<List<UserDTO>> GetAllAsync()
+    public async Task<List<UserDTO>> GetAllAsync(string uId)
     {
-        var response = await _httpClient.GetAsync("/budget");
+        var response = await _httpClient.GetAsync($"/budget/{uId}");
 
         if (!response.IsSuccessStatusCode)
         {
@@ -44,9 +53,9 @@ public class UserService(IHttpClientFactory factory) : IRepository<UserDTO>
         return await response.Content.ReadAsStringAsync();
     }
 
-    public async Task UpdateAsync(UserDTO item, string id)
+    public async Task UpdateAsync(UserDTO item, string docId)
     {
-        var response = await _httpClient.PutAsJsonAsync($"/user/{id}", item);
+        var response = await _httpClient.PutAsJsonAsync($"/user/{docId}", item);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -54,9 +63,9 @@ public class UserService(IHttpClientFactory factory) : IRepository<UserDTO>
         }
     }
 
-    public async Task RemoveAsync(string id)
+    public async Task DeleteAsync(string uId)
     {
-        var response = await _httpClient.DeleteAsync($"/user/{id}");
+        var response = await _httpClient.DeleteAsync($"/user/{uId}");
 
         if (!response.IsSuccessStatusCode)
         {

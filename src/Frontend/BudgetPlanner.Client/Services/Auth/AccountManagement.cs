@@ -17,7 +17,7 @@ namespace BudgetPlanner.Client.Services.Auth;
 public interface IAccountManagement
 {
     Task<UserDTO?> RegisterAsync(string email, string password, string username);
-    Task<UserDTO?> LoginAsync(string email, string password);
+    Task<string?> LoginAsync(string email, string password);
     Task<string> LogoutAsync();
     Task<bool> CheckAuthenticatedAsync();
 }
@@ -36,15 +36,18 @@ public class AccountManagement : IAccountManagement
     {
         var client = _httpClientFactory.CreateClient("BudgetPlannerAPI");
 
-        var requestData = new
+        var regUser = new UserDTO
         {
             Email = email,
             Password = password,
             Username = username
         };
 
+
         // Simplified method using PostAsJsonAsync
-        var response = await client.PostAsJsonAsync("account/register", requestData);
+        var response = await client.PostAsJsonAsync("account/register", regUser);
+
+        Console.WriteLine("RESPONSE:" + response);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -54,25 +57,25 @@ public class AccountManagement : IAccountManagement
         return await response.Content.ReadFromJsonAsync<UserDTO>();
     }
 
-    public async Task<UserDTO?> LoginAsync(string email, string password)
+    public async Task<string?> LoginAsync(string email, string password)
     {
 
         var client = _httpClientFactory.CreateClient("BudgetPlannerAPI");
 
-        var requestData = new
+        var regUser = new UserDTO
         {
             Email = email,
-            Password = password,
+            Password = password
         };
 
-        var response = await client.PostAsJsonAsync("account/login", requestData);
+        var response = await client.PostAsJsonAsync("account/login", regUser);
 
         if (!response.IsSuccessStatusCode)
         {
             throw new HttpRequestException($"Cannot retrieve data. Status code: {response.StatusCode}");
         }
 
-        return await response.Content.ReadFromJsonAsync<UserDTO>();
+        return await response.Content.ReadFromJsonAsync<string>();
     }
 
     public async Task<string> LogoutAsync()

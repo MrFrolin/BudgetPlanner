@@ -1,13 +1,16 @@
 using BudgetPlanner.DataAccess;
+using BudgetPlanner.DataAccess.Repositories;
 using BudgetPlanner.DataAccess.UnitOfWork;
 using BudgetPlanner.Server.Endpoints;
 using BudgetPlanner.Server.Services;
+using BudgetPlanner.Server.Services.Middleware;
 using Firebase.Auth;
 using Firebase.Auth.Providers;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server;
 using Microsoft.IdentityModel.Tokens;
 
 
@@ -65,6 +68,7 @@ builder.Services.AddAuthorization();
 // Register AuthenticationCore and UnitOfWork
 builder.Services.AddAuthenticationCore();
 builder.Services.AddSingleton<IUnitOfWork, UnitOfWork>();
+builder.Services.AddSingleton<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<IAccountManagement, FirebaseAuthenticationStateProvide>();
 builder.Services.AddScoped<AuthenticationStateProvider, FirebaseAuthenticationStateProvide>();
@@ -81,6 +85,11 @@ builder.Services.AddCors(options =>
             .AllowCredentials());
 });
 
+builder.Services.Configure<CircuitOptions>(options =>
+{
+    options.DetailedErrors = true;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -95,8 +104,10 @@ if (app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
+
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<TokenValidationMiddleware>();
 
 
 app.MapBudgetEndpoints();
