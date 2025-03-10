@@ -10,7 +10,7 @@ using User = BudgetPlanner.DataAccess.CustomerAuth.Models.User;
 
 namespace BudgetPlanner.Server.Services;
 
-public interface IAccountManagement
+public interface IFirebaseAuthenticationStateProvide
 {
     Task<UserDTO> RegisterAsync(string email, string password, string username);
     Task<string> LoginAsync(string email, string password);
@@ -20,7 +20,7 @@ public interface IAccountManagement
 }
 
 public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
-    , IAccountManagement
+    , IFirebaseAuthenticationStateProvide
 {
 
     private bool _authenticated = false;
