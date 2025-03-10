@@ -35,7 +35,7 @@ public class BudgetService(IHttpClientFactory factory) : IRepository<BudgetDTO>
 
     public async Task<string> AddAsync(BudgetDTO item, string uId)
     {
-        var response = await _httpClient.PostAsJsonAsync($"/budget{uId}", item);
+        var response = await _httpClient.PostAsJsonAsync($"/budget/{uId}", item);
 
         if (!response.IsSuccessStatusCode)
         {

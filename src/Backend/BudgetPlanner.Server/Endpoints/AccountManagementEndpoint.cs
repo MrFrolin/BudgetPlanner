@@ -1,6 +1,7 @@
 ﻿using BudgetPlanner.Server.Services;
 using BudgetPlanner.Server.Services.Middleware;
 using BudgetPlanner.Shared.DTOs;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace BudgetPlanner.Server.Endpoints;
@@ -15,7 +16,8 @@ public static class AccountManagementEndpoint
         group.MapPost("/register", RegisterUser);
         group.MapPost("/logout", LogoutAsync);
         group.MapGet("/checkToken", CheckAuthenticatedAsync);
-        
+        group.MapGet("/getState", GetAuthenticationState);
+
         return app;
     }
 
@@ -60,5 +62,19 @@ public static class AccountManagementEndpoint
         var isAuthenticated = await accountManagement.CheckAuthenticatedAsync();
 
         return TypedResults.Ok(isAuthenticated);
+    }
+
+    private static async Task<Ok<AuthenticationState>> GetAuthenticationState(IAccountManagement accountManagement)
+    {
+        try
+        {
+            var authState = await accountManagement.GetAuthenticationStateAsync();
+            return TypedResults.Ok(authState);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }
