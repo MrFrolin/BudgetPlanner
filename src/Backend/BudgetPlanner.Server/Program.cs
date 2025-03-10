@@ -11,6 +11,7 @@ using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 
@@ -18,8 +19,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 string? filepath = builder.Configuration["GoogleCloud:KeyFilePath"];
 string projectId = builder.Configuration["GoogleCloud:ProjectId"];
-
-
 builder.Services.AddSingleton(provider => new FirestoreDbContext(filepath, projectId));
 
 
@@ -33,13 +32,13 @@ builder.Services.AddSingleton(FirebaseApp.Create(new AppOptions()
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = $"https://securetoken.google.com/{projectId}";
+        options.Authority = builder.Configuration["Authentication:Authority"];
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = $"https://securetoken.google.com/{projectId}",
+            ValidIssuer = builder.Configuration["Authentication:ValidIssuer"],
             ValidateAudience = true,
-            ValidAudience = $"{projectId}",
+            ValidAudience = builder.Configuration["Authentication:ValidAudience"],
             ValidateLifetime = true
         };
     });
