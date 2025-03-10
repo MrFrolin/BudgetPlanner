@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @inject IAccountManagement CustomAuthenticationStateProvider
 @inject IUserService userService
+@inject IRepository<BudgetDTO> budgetService
 
 
 
@@ -26,6 +27,16 @@
         Console.WriteLine("ANVÄNDARE REGISTRERAD");
 
         await userService.AddAsync(userDTO);
+
+		var budget = new BudgetDTO
+			{
+				Year = 2025,
+				Month = 12,
+				TransactionIds = new List<string>()
+			};
+
+        await budgetService.AddAsync(budget, test);
+
     }
 
     private async Task LoadFromLocalStorage()

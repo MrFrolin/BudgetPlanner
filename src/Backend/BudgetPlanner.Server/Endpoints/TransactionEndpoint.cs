@@ -8,7 +8,7 @@ public static class TransactionEndpoint
 
     public static IEndpointRouteBuilder MapTransactionEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("transaction").RequireAuthorization();
+        var group = app.MapGroup("transaction");
 
         group.MapGet("/", GetAllTransactions);
         group.MapGet("/{id}", GetTransactionById);

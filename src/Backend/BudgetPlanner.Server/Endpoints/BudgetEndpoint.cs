@@ -10,11 +10,11 @@ public static class BudgetEndpoint
 {
     public static IEndpointRouteBuilder MapBudgetEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("budget").RequireAuthorization();
+        var group = app.MapGroup("budget");
 
         group.MapGet("/", GetAllBudgets);
         group.MapGet("/{docId}", GetBudgetById);
-        group.MapPost("/", AddBudget);
+        group.MapPost("/{uId}", AddBudget);
         group.MapPut("/{docId}", UpdateBudget);
         group.MapDelete("/{docId}", DeleteBudget);
 
