@@ -16,6 +16,7 @@ public interface IAccountManagement
     Task<string> LoginAsync(string email, string password);
     void LogoutAsync();
     Task<bool> CheckAuthenticatedAsync();
+    Task<AuthenticationState> GetAuthenticationStateAsync();
 }
 
 public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
@@ -167,7 +168,7 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
 
     public void LogoutAsync()
     {
-        _cache.Remove("id_token");
+        _cache.Remove("userAuth");
         _cache.Remove("refresh_token");
 
         if (_firebaseAuthClient?.User != null)

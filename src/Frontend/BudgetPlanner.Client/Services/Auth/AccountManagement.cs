@@ -20,6 +20,7 @@ public interface IAccountManagement
     Task<string?> LoginAsync(string email, string password);
     Task<string> LogoutAsync();
     Task<bool> CheckAuthenticatedAsync();
+    Task<AuthenticationState> GetAuthenticationStateAsync();
 }
 
 public class AccountManagement : IAccountManagement
@@ -43,8 +44,6 @@ public class AccountManagement : IAccountManagement
             Username = username
         };
 
-
-        // Simplified method using PostAsJsonAsync
         var response = await client.PostAsJsonAsync("account/register", regUser);
 
         Console.WriteLine("RESPONSE:" + response);
@@ -104,6 +103,19 @@ public class AccountManagement : IAccountManagement
         }
 
         return await response.Content.ReadFromJsonAsync<bool>();
+    }
+
+    public async Task<AuthenticationState> GetAuthenticationStateAsync()
+    {
+        var client = _httpClientFactory.CreateClient("BudgetPlannerAPI");
+        var response = await client.GetAsync("account/getState");
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<AuthenticationState>();
+        }
+
+        return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
     }
 
 }
