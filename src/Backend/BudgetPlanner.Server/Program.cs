@@ -11,7 +11,6 @@ using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 
@@ -43,8 +42,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-var firebaseAuthAPIKey = builder.Configuration["FirebaseAuthConfig:APIKey"];
-var authDomain = builder.Configuration["FirebaseAuthConfig:AuthDomain"];
+var firebaseAuthAPIKey = builder.Configuration["Firebase:APIKey"];
+var authDomain = builder.Configuration["Firebase:AuthDomain"];
 
 builder.Services.AddSingleton(new FirebaseAuthClient(new FirebaseAuthConfig()
 {

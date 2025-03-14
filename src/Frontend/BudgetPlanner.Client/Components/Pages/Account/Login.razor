@@ -51,13 +51,21 @@
 
         <div class="button-group">
             <button type="submit" class="btn btn-primary">Login</button>
-            <button @onclick="NavigateToRegister" class="btn btn-secondary">Register</button>
+            <button @onclick="Logout" class="btn btn-secondary">Logout</button>
         </div>
     </EditForm>
 </div>
 
+@if (_authenticated)
+{
+    <p>Authenticated</p>
+}
+
 @code {
     private UserDTO user = new();
+
+    public bool _authenticated = false;
+
 
     private async Task HandleLogin()
     {
@@ -77,17 +85,23 @@
 
         user = testing;
 
-        // Id = "PhilipUSER",
-        // Password = "123korv",
-        // Email = "Korv@hotmail.com"
-
-
+        Console.WriteLine(testing);
+        await LocateAutenticationState();
     }
 
-    private void NavigateToRegister()
+    private async Task LocateAutenticationState()
     {
-        // Navigate to register page (update based on your routing)
-        Navigation.NavigateTo("/register");
+        var authKey = await  account.CheckAuthenticatedAsync();
+        if (authKey != null && authKey)
+        {
+            _authenticated = authKey;
+        }
+    }
+
+    private async void Logout()
+    {
+        await account.LogoutAsync();
+        await LocateAutenticationState();
     }
 
     [Inject] NavigationManager Navigation { get; set; } = default!;
