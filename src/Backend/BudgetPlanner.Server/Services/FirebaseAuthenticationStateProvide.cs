@@ -136,7 +136,7 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            return null;
         }
     }
 
@@ -163,7 +163,7 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
 
             return result.User.Uid;
         }
-        throw new Exception("login fail, string seems to be null");
+        return null;
     }
 
     public void LogoutAsync()
