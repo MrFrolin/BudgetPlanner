@@ -1,13 +1,13 @@
 # Personal Finance Tracker (Under Development)
 
-This project developed for a private use to easy keep track of my expences. The goal is to provide a platform for users to track their income, expenses, set budgets, and achieve their financial goals.
+This project is designed for personal use to simplify expense tracking. The goal is to provide a platform for users to monitor their income and expenses, set budgets, and achieve their financial goals.
 
 ## Key Features
 
-- **Expense Tracker:** Log and categorize daily expenses to keep track of spending habits.  
-- **Income Tracker:** Record different sources of income and monitor overall earnings.  
-- **Budget Planning:** Set monthly budgets for categories and track progress.  
-- **Financial Goals:** Set savings goals and monitor progress towards achieving them.  
+- **Expense Tracker:** Log and categorize daily expenses to analyze spending habits.
+- **Income Tracker:** Record different income sources and track overall earnings. 
+- **Budget Planning:** Set monthly budgets for various categories and monitor progress.
+- **Financial Goals:** Define savings goals and track progress toward achieving them. 
 
 ## Tech Stack
 
