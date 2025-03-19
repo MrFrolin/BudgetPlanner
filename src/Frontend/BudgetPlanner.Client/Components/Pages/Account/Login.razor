@@ -1,41 +1,12 @@
-﻿@* @page "/login"
-@rendermode InteractiveServer
-@inject IAccountManagement account
-@inject Blazored.LocalStorage.ILocalStorageService localStorage
-@inject NavigationManager navigationManager
-
-@code {
-    private string _spinnerClass = "";
-    private SignInDTO _signInDtoModel = new();
-    private string[] _errors = [];
-
-    private async Task LoginUser()
-    {
-        _spinnerClass = "spinner-border spinner-border-sm";
-        // // var result = await account.LoginAsync(_signInDtoModel.Email, _signInDtoModel.Password);
-        // if (result != null)
-        // {
-        //     await localStorage.SetItemAsync("authToken", result.Id); //korrigera till token typ
-        //     navigationManager.NavigateTo("/");
-        // }
-        // else
-        // {
-        //     _spinnerClass = "";
-        //     _errors = new string[] { "Invalid email or password" };
-        // }
-
-    }
-} *@
-
-@page "/login"
+﻿@page "/login"
 @inject IAccountManagement account
 @inject IUserService userService
 @rendermode InteractiveServer
 
-<h3>Login</h3>
+@* <h3>Login</h3>
 
 <div class="login-container">
-    <EditForm Model="@user" OnValidSubmit="HandleLogin">
+    <EditForm Model="@user">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
@@ -50,27 +21,54 @@
         </div>
 
         <div class="button-group">
-            <button type="submit" class="btn btn-primary">Login</button>
+            <button @onclick="HandleLogin" class="btn btn-primary">Login</button>
             <button @onclick="Logout" class="btn btn-secondary">Logout</button>
         </div>
     </EditForm>
-</div>
+</div> *@
+
+<RadzenStack Gap="0" class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10" Style="width: 100%; max-width: 400px; overflow: hidden;">
+    <RadzenCard class="rz-shadow-0 rz-border-radius-0 rz-background-color-info rz-p-12" style="text-align: center;">
+        <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.H2" class="rz-color-white rz-mb-0">Login</RadzenText>
+    </RadzenCard>
+    <RadzenCard class="rz-shadow-0 rz-p-12">
+        <RadzenTemplateForm Data=@user>
+            <RadzenFieldset Text="Sign in">
+                <RadzenTextBox Label="Email" @bind-Value="user.Email" Style="width: 100%;" />
+                <RadzenTextBox Label="Password" @bind-Value="user.Password" Type="password" Style="width: 100%;" />
+            </RadzenFieldset>
+            <RadzenButton Text="Login" Click="@OnLogin" ButtonStyle="ButtonStyle.Primary" Style="width: 100%;" />
+        </RadzenTemplateForm>
+    </RadzenCard>
+</RadzenStack>
+
+
+
 
 @if (_authenticated)
 {
     <p>Authenticated</p>
 }
+else
+{
+    <p>Not Authenticated</p>
+}
 
 @code {
-    private UserDTO user = new();
 
     public bool _authenticated = false;
 
+    private UserDTO user = new();
 
-    private async Task HandleLogin()
+    async Task OnLogin()
     {
         var uId = await account.LoginAsync(user.Email, user.Password);
         // Add authentication logic here
+
+        if (uId == null)
+        {
+            return;
+        }
 
         var userDTO = await userService.GetByIdAsync(uId);
 
@@ -89,16 +87,68 @@
         await LocateAutenticationState();
     }
 
+    void OnRegister(string name)
+    {
+        //test
+    }
+
+    async Task onLogout()
+    {
+        await account.LogoutAsync();
+        await LocateAutenticationState();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private async Task HandleLogin()
+    {
+        var uId = await account.LoginAsync(user.Email, user.Password);
+        // Add authentication logic here
+
+        if(uId == null){
+			return;
+        }
+
+        var userDTO = await userService.GetByIdAsync(uId);
+
+        var testing = new UserDTO
+            {
+                Id = userDTO.Id,
+                Password = userDTO.Password,
+                Email = userDTO.Email,
+                BudgetsId = new List<string>(),
+                TransactionIds = new List<string>()
+            };
+
+        user = testing;
+
+        Console.WriteLine(testing);
+        await LocateAutenticationState();
+
+		Navigation.NavigateTo("/");
+    }
+
     private async Task LocateAutenticationState()
     {
         var authKey = await  account.CheckAuthenticatedAsync();
-        if (authKey != null && authKey)
+        if (authKey != null)
         {
             _authenticated = authKey;
         }
+        StateHasChanged();
     }
 
-    private async void Logout()
+    private async Task Logout()
     {
         await account.LogoutAsync();
         await LocateAutenticationState();

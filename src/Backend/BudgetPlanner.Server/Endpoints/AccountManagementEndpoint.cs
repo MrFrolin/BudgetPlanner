@@ -38,7 +38,7 @@ public static class AccountManagementEndpoint
 
         if (uId == null)
         {
-            return TypedResults.NotFound("Wrong username or password");
+            return TypedResults.NotFound("User not found. Wrong username or password");
         }
 
         return TypedResults.Ok(uId);
@@ -47,7 +47,7 @@ public static class AccountManagementEndpoint
     {
         try
         {
-            accountManagement.LogoutAsync();
+            await accountManagement.LogoutAsync();
             return TypedResults.Ok("User logged out");
         }
         catch (Exception e)

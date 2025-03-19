@@ -14,7 +14,7 @@ public interface IAccountManagement
 {
     Task<UserDTO> RegisterAsync(string email, string password, string username);
     Task<string> LoginAsync(string email, string password);
-    void LogoutAsync();
+    Task LogoutAsync();
     Task<bool> CheckAuthenticatedAsync();
     Task<AuthenticationState> GetAuthenticationStateAsync();
 }
@@ -54,7 +54,8 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
             var idToken = _cache.Get("userAuth")?.ToString();
             if (string.IsNullOrEmpty(idToken))
             {
-                throw new Exception("No token found");
+                _authenticated = false;
+                return new AuthenticationState(_unAuthenticated);
             }
 
             var refreshToken = _cache.Get("refresh_token")?.ToString();
@@ -166,7 +167,7 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
         return null;
     }
 
-    public void LogoutAsync()
+    public Task LogoutAsync()
     {
         _cache.Remove("userAuth");
         _cache.Remove("refresh_token");
@@ -176,6 +177,8 @@ public class FirebaseAuthenticationStateProvide : AuthenticationStateProvider
             _firebaseAuthClient.SignOut();
         }
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+
+        return Task.CompletedTask;
     }
 
     public async Task<bool> CheckAuthenticatedAsync()

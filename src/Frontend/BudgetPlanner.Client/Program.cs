@@ -7,6 +7,7 @@ using BudgetPlanner.Shared.Interfaces;
 using Firebase.Auth;
 using Firebase.Auth.Providers;
 using Microsoft.AspNetCore.Components.Authorization;
+using Radzen;
 
 namespace BudgetPlanner.Client
 {
@@ -30,6 +31,8 @@ namespace BudgetPlanner.Client
 
             builder.Services.AddSingleton<IRepository<BudgetDTO>, BudgetService>();
             builder.Services.AddSingleton<IUserService, UserService>();
+
+            builder.Services.AddRadzenComponents();
 
             var app = builder.Build();
 

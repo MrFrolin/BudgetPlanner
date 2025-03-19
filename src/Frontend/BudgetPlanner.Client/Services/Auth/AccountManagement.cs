@@ -71,7 +71,7 @@ public class AccountManagement : IAccountManagement
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new HttpRequestException($"Cannot retrieve data. Status code: {response.StatusCode}");
+            return null;
         }
 
         return await response.Content.ReadFromJsonAsync<string>();
