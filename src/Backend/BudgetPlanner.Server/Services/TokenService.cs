@@ -1,9 +1,5 @@
-﻿using System.Diagnostics.Eventing.Reader;
-using Firebase.Auth.Requests;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using BudgetPlanner.DataAccess.CustomerAuth.Models;
-using Firebase.Auth;
 using System.Text.Json.Serialization;
 
 namespace BudgetPlanner.Server.Services;

@@ -1,4 +1,4 @@
-﻿namespace BudgetPlanner.DataAccess.CustomerAuth.Models;
+﻿namespace BudgetPlanner.Server.AuthModels;
 
 public class UserInfo
 {

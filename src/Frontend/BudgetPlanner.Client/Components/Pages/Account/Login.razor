@@ -1,5 +1,5 @@
 ﻿@page "/login"
-@inject IAccountManagement account
+@inject IFirebaseAuthStateProvider account
 @inject IUserService userService
 @rendermode InteractiveServer
 
@@ -85,6 +85,8 @@ else
 
         Console.WriteLine(testing);
         await LocateAutenticationState();
+        Navigation.NavigateTo("/login");
+
     }
 
     void OnRegister(string name)
@@ -140,11 +142,18 @@ else
 
     private async Task LocateAutenticationState()
     {
-        var authKey = await  account.CheckAuthenticatedAsync();
-        if (authKey != null)
+        var authKey = await account.CheckAuthenticatedAsync();
+        if (authKey)
         {
-            _authenticated = authKey;
+            // Update the _authenticated status based on the auth state
+            _authenticated = true;
         }
+        else
+        {
+            _authenticated = false;
+        }
+
+        // Notify Blazor about the state change
         StateHasChanged();
     }
 

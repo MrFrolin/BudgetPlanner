@@ -1,11 +1,11 @@
 ﻿namespace BudgetPlanner.Shared.DTOs;
 
-public class UserInfoDTO
+public class UserInfoDto
 {
-    public User[] Users { get; set; }
+    public FirebaseUserDto[] Users { get; set; }
 }
 
-public class User
+public class FirebaseUserDto
 {
     public string LocalId { get; set; }
     public string Email { get; set; }

@@ -1,7 +1,7 @@
-﻿using BudgetPlanner.Server.Services;
+﻿using BudgetPlanner.Server.AuthModels;
+using BudgetPlanner.Server.Services;
 using BudgetPlanner.Server.Services.Middleware;
 using BudgetPlanner.Shared.DTOs;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace BudgetPlanner.Server.Endpoints;
@@ -16,12 +16,12 @@ public static class AccountManagementEndpoint
         group.MapPost("/register", RegisterUser);
         group.MapPost("/logout", LogoutAsync);
         group.MapGet("/checkToken", CheckAuthenticatedAsync);
-        group.MapGet("/getState", GetAuthenticationState);
+        group.MapGet("/userInfo", GetFirebaseUser);
 
         return app;
     }
 
-    private static async Task<Results<Ok<UserDTO>, BadRequest<string>>> RegisterUser(IAccountManagement accountManagement, UserDTO regUser)
+    private static async Task<Results<Ok<UserDTO>, BadRequest<string>>> RegisterUser(IFirebaseAccountManagement accountManagement, UserDTO regUser)
     {
         var userDTO = await accountManagement.RegisterAsync(regUser.Email, regUser.Password, regUser.Username);
 
@@ -32,7 +32,7 @@ public static class AccountManagementEndpoint
         return TypedResults.Ok(userDTO);
     }
 
-    private static async Task<Results<Ok<string>, NotFound<string>>> LoginAsync(IAccountManagement accountManagement, UserDTO regUser)
+    private static async Task<Results<Ok<string>, NotFound<string>>> LoginAsync(IFirebaseAccountManagement accountManagement, UserDTO regUser)
     {
         var uId = await accountManagement.LoginAsync(regUser.Email, regUser.Password);
 
@@ -43,7 +43,7 @@ public static class AccountManagementEndpoint
 
         return TypedResults.Ok(uId);
     }
-    private static async Task<Ok<string>> LogoutAsync(IAccountManagement accountManagement)
+    private static async Task<Ok<string>> LogoutAsync(IFirebaseAccountManagement accountManagement)
     {
         try
         {
@@ -57,19 +57,19 @@ public static class AccountManagementEndpoint
         }
     }
 
-    private static async Task<Ok<bool>> CheckAuthenticatedAsync(IAccountManagement accountManagement)
+    private static async Task<Ok<bool>> CheckAuthenticatedAsync(IFirebaseAccountManagement accountManagement)
     {
         var isAuthenticated = await accountManagement.CheckAuthenticatedAsync();
 
         return TypedResults.Ok(isAuthenticated);
     }
 
-    private static async Task<Ok<AuthenticationState>> GetAuthenticationState(IAccountManagement accountManagement)
+    private static async Task<Ok<User>> GetFirebaseUser(IFirebaseAccountManagement accountManagement)
     {
         try
         {
-            var authState = await accountManagement.GetAuthenticationStateAsync();
-            return TypedResults.Ok(authState);
+            var user = await accountManagement.GetFirebaseUser();
+            return TypedResults.Ok(user);
         }
         catch (Exception e)
         {

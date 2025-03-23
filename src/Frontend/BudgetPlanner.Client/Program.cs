@@ -27,7 +27,8 @@ namespace BudgetPlanner.Client
                 client.BaseAddress = new Uri(localhostUrl);
             });
 
-            builder.Services.AddScoped<IAccountManagement, AccountManagement>();
+            builder.Services.AddScoped<IFirebaseAuthStateProvider, FirebaseAuthStateProvider>();
+            builder.Services.AddScoped<AuthenticationStateProvider, FirebaseAuthStateProvider>();
 
             builder.Services.AddSingleton<IRepository<BudgetDTO>, BudgetService>();
             builder.Services.AddSingleton<IUserService, UserService>();

@@ -68,8 +68,7 @@ builder.Services.AddAuthenticationCore();
 builder.Services.AddSingleton<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 
-builder.Services.AddScoped<IAccountManagement, FirebaseAuthenticationStateProvide>();
-builder.Services.AddScoped<AuthenticationStateProvider, FirebaseAuthenticationStateProvide>();
+builder.Services.AddScoped<IFirebaseAccountManagement, FirebaseAccountManagement>();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 

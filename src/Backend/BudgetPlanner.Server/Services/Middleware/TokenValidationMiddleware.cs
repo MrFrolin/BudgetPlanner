@@ -1,4 +1,6 @@
-﻿using BudgetPlanner.Server.Services;
+﻿using BudgetPlanner.Server.AuthModels;
+using BudgetPlanner.Server.Services;
+using BudgetPlanner.Shared.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -13,7 +15,7 @@ public class TokenValidationMiddleware
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, IMemoryCache cache, IAccountManagement tokenService)
+    public async Task InvokeAsync(HttpContext context, IMemoryCache cache, IFirebaseAccountManagement tokenService)
     {
         var endpoint = context.GetEndpoint();
 
@@ -23,7 +25,7 @@ public class TokenValidationMiddleware
             return;
         }
 
-        if (!cache.TryGetValue("userAuth", out string? token) || string.IsNullOrEmpty(token) || !await tokenService.CheckAuthenticatedAsync())
+        if (!cache.TryGetValue("credential", out Credential? credential) || string.IsNullOrEmpty(credential.IdToken) || !await tokenService.CheckAuthenticatedAsync())
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsync("Unauthorized");
